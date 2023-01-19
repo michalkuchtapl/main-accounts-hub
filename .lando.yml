@@ -1,0 +1,10 @@
+name: main-accounts-hub
+recipe: laravel
+config:
+  php: '8.1'
+  webroot: public
+services:
+  database:
+    portforward: 3307
+  mailhog:
+    type: mailhog
