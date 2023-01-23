@@ -28,7 +28,7 @@ class RegenerateToken extends Command
      */
     public function handle()
     {
-        $this->info("What is the domain of the app?");
+        $this->info('What is the domain of the app?');
         $domain = $this->askForDomain();
 
         $application = Application::whereDomain($domain)
@@ -36,8 +36,9 @@ class RegenerateToken extends Command
 
         $confirmation = $this->confirm("Are you sure you want to regenerate token for that domain? ($domain)");
 
-        if (!$confirmation) {
-            $this->info("Cancelled");
+        if (! $confirmation) {
+            $this->info('Cancelled');
+
             return Command::SUCCESS;
         }
 
@@ -45,26 +46,29 @@ class RegenerateToken extends Command
         $token = $application->createToken("{$application->name} token");
 
         $this->warn("Your app's token has been recreated. You will see that token only once, so please save it in safe place.");
-        $this->info("Token: " . $token->plainTextToken);
+        $this->info('Token: '.$token->plainTextToken);
 
         return Command::SUCCESS;
     }
 
     /**
      * Ask for and validate domain
+     *
      * @return string
      */
     private function askForDomain(): string
     {
-        $domain = trim($this->ask("Domain: "));
+        $domain = trim($this->ask('Domain: '));
 
         if (empty($domain)) {
-            $this->error("The domain cannot be empty");
+            $this->error('The domain cannot be empty');
+
             return $this->askForDomain();
         }
 
         if (Application::whereDomain($domain)->doesntExist()) {
             $this->error("Application with that domain doesn't exists.");
+
             return $this->askForName();
         }
 

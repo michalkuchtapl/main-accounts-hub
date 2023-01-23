@@ -28,7 +28,7 @@ class RemoveApplication extends Command
      */
     public function handle()
     {
-        $this->info("What is the domain of the app?");
+        $this->info('What is the domain of the app?');
         $domain = $this->askForDomain();
 
         $application = Application::whereDomain($domain)
@@ -36,34 +36,38 @@ class RemoveApplication extends Command
 
         $confirmation = $this->confirm("Are you sure you want to remove application? ($domain)");
 
-        if (!$confirmation) {
-            $this->info("Cancelled");
+        if (! $confirmation) {
+            $this->info('Cancelled');
+
             return Command::SUCCESS;
         }
 
         $application->tokens()->delete();
         $application->delete();
 
-        $this->info("Your app has been removed.");
+        $this->info('Your app has been removed.');
 
         return Command::SUCCESS;
     }
 
     /**
      * Ask for and validate domain
+     *
      * @return string
      */
     private function askForDomain(): string
     {
-        $domain = trim($this->ask("Domain: "));
+        $domain = trim($this->ask('Domain: '));
 
         if (empty($domain)) {
-            $this->error("The domain cannot be empty");
+            $this->error('The domain cannot be empty');
+
             return $this->askForDomain();
         }
 
         if (Application::whereDomain($domain)->doesntExist()) {
             $this->error("Application with that domain doesn't exists.");
+
             return $this->askForName();
         }
 

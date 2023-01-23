@@ -16,3 +16,6 @@ This is main accounts hub for all of my other projects to keep users data in one
 - `GET /api/users/{id}` - returns user by id
 - `PUT /api/users/{id}` - updates user
 - `DELETE /api/users/{id}` - deletes user
+
+
+Add queue: activity-logs

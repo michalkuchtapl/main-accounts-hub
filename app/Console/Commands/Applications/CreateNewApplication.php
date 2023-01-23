@@ -5,6 +5,7 @@ namespace App\Console\Commands\Applications;
 use App\Models\Application;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Permission;
 
 class CreateNewApplication extends Command
 {
@@ -29,48 +30,56 @@ class CreateNewApplication extends Command
      */
     public function handle()
     {
-        $this->info("What is the name of the new app?");
+        $this->info('What is the name of the new app?');
         $name = $this->askForName();
 
-        $this->info("What is the domain of the new app?");
+        $this->info('What is the domain of the new app?');
         $domain = $this->askForDomain();
 
         $application = new Application();
         $application->name = $name;
         $application->domain = $domain;
         $application->slug = Str::slug($name);
+
+        $permission = Permission::create(['name' => "application-{$application->slug}"]);
+        $application->permission_id = $permission->id;
+
         $application->save();
 
         $token = $application->createToken("$name token");
 
         $this->warn("Your app's token has been created. You will see that token only once, so please save it in safe place.");
-        $this->info("Token: " . $token->plainTextToken);
+        $this->info('Token: '.$token->plainTextToken);
 
         return Command::SUCCESS;
     }
 
     /**
      * Ask for and validate domain
+     *
      * @return string
      */
     private function askForDomain(): string
     {
-        $domain = trim($this->ask("Domain: "));
+        $domain = trim($this->ask('Domain: '));
 
         if (empty($domain)) {
-            $this->error("The domain cannot be empty.");
+            $this->error('The domain cannot be empty.');
+
             return $this->askForDomain();
         }
 
-        $domain = parse_url($domain,  PHP_URL_HOST);
+        $domain = parse_url($domain, PHP_URL_HOST);
 
-        if (!$domain) {
-            $this->error("Invalid domain format.");
+        if (! $domain) {
+            $this->error('Invalid domain format.');
+
             return $this->askForDomain();
         }
 
         if (Application::whereDomain($domain)->exists()) {
-            $this->error("Application with same domain already exists. Please provide unique domain for the app.");
+            $this->error('Application with same domain already exists. Please provide unique domain for the app.');
+
             return $this->askForName();
         }
 
@@ -79,21 +88,24 @@ class CreateNewApplication extends Command
 
     /**
      * Ask for and validate name
+     *
      * @return string
      */
     private function askForName(): string
     {
-        $name = trim($this->ask("Name: "));
+        $name = trim($this->ask('Name: '));
 
         if (empty($name)) {
-            $this->error("The name cannot be empty");
+            $this->error('The name cannot be empty');
+
             return $this->askForName();
         }
 
         $slug = Str::slug($name);
 
         if (Application::whereSlug($slug)->exists()) {
-            $this->error("Application with similar name already exists. Please provide unique name for the app.");
+            $this->error('Application with similar name already exists. Please provide unique name for the app.');
+
             return $this->askForName();
         }
 

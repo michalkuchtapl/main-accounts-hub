@@ -1,8 +1,7 @@
 <?php
 
-use App\Http\Controllers\Api\UsersController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Users;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,5 +15,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('users')->group(function () {
-    Route::get('/', [UsersController::class, 'list'])->name('users.list');
+    Route::post('/', Users\StoreUserHandler::class)->name('users.store');
+    Route::post('/auth', Users\AuthUserHandler::class)->name('users.auth');
+    Route::post('/validate', Users\ValidateUserSessionHandler::class)->name('users.validate');
+    Route::put('/{user}', Users\UpdateUserHandler::class)->name('users.update');
 });
